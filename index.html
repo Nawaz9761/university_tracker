@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>University Finder — CS &amp; Computer Engineering (Global)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bp-deep:#0B2340;
+    --bp-mid:#123057;
+    --bp-mid2:#193d6c;
+    --bp-panel:#0F2A4D;
+    --grid-line:rgba(143,171,201,0.14);
+    --grid-line-strong:rgba(143,171,201,0.28);
+    --ink:#EAF1F8;
+    --ink-dim:#93AAC5;
+    --ink-dimmer:#5E7896;
+    --amber:#FFB627;
+    --amber-dim:rgba(255,182,39,0.16);
+    --teal:#5FD9A4;
+    --teal-dim:rgba(95,217,164,0.16);
+    --copper:#FF7A5C;
+    --copper-dim:rgba(255,122,92,0.16);
+    --likely:#6FB1FF;
+    --likely-dim:rgba(111,177,255,0.16);
+    --red:#FF5A5A;
+    --red-dim:rgba(255,90,90,0.16);
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bp-deep);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .display{font-family:'Space Grotesk',sans-serif;}
+
+  header{
+    border-bottom:1px solid var(--grid-line-strong);
+    padding:36px 5vw 28px;
+    position:relative;
+  }
+  .corner{
+    position:absolute; width:14px; height:14px;
+    border:2px solid var(--amber); opacity:0.8;
+  }
+  .corner.tl{top:14px;left:14px;border-right:none;border-bottom:none;}
+  .corner.tr{top:14px;right:14px;border-left:none;border-bottom:none;}
+  .corner.bl{bottom:14px;left:14px;border-right:none;border-top:none;}
+  .corner.br{bottom:14px;right:14px;border-left:none;border-top:none;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--amber); margin-bottom:10px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(24px,3.6vw,40px);
+    font-weight:700; margin:0 0 10px; line-height:1.05;
+    letter-spacing:-0.01em;
+  }
+  header p.sub{
+    color:var(--ink-dim); max-width:680px; font-size:15px; line-height:1.55; margin:0;
+  }
+  .header-meta{
+    display:flex; gap:28px; flex-wrap:wrap; margin-top:24px;
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-dimmer);
+  }
+  .header-meta span b{color:var(--ink-dim); font-weight:600;}
+
+  .stats{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:1px; background:var(--grid-line-strong);
+    border-top:1px solid var(--grid-line-strong); border-bottom:1px solid var(--grid-line-strong);
+  }
+  .stat{
+    background:var(--bp-deep); padding:16px 5vw;
+  }
+  .stat .num{font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; color:var(--amber);}
+  .stat .label{font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.07em; color:var(--ink-dimmer); margin-top:4px;}
+
+  .profile-panel{
+    margin:26px 5vw 0; border:1px solid var(--grid-line-strong); border-radius:var(--radius);
+    background:var(--bp-panel); padding:22px 24px; position:relative;
+  }
+  .profile-panel .corner{border-color:var(--teal);}
+  .profile-title{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--teal); margin-bottom:4px;
+  }
+  .profile-sub{color:var(--ink-dimmer); font-size:12.5px; margin-bottom:18px; max-width:620px; line-height:1.5;}
+  .profile-grid{display:flex; flex-wrap:wrap; gap:22px; align-items:flex-end;}
+  .profile-field label{
+    display:block; font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase;
+    letter-spacing:0.06em; color:var(--ink-dimmer); margin-bottom:6px;
+  }
+  .profile-field select, .profile-field input{
+    background:var(--bp-mid); border:1px solid var(--grid-line-strong); border-radius:8px;
+    padding:9px 11px; color:var(--ink); font-family:'JetBrains Mono',monospace; font-size:13px;
+    outline:none; width:100px;
+  }
+  .profile-field select:focus, .profile-field input:focus{border-color:var(--teal);}
+  .profile-field input::placeholder{color:var(--ink-dimmer); font-size:11.5px;}
+  .profile-reset{
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-dimmer);
+    background:none; border:1px solid var(--grid-line-strong); border-radius:8px; padding:9px 14px;
+    cursor:pointer; transition:all .15s ease;
+  }
+  .profile-reset:hover{border-color:var(--red); color:var(--red);}
+  .profile-status{margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-dimmer);}
+  .profile-status b{color:var(--teal);}
+
+  .controls{
+    padding:22px 5vw; display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+    border-bottom:1px solid var(--grid-line-strong);
+  }
+  .search-wrap{position:relative; flex:1 1 220px; min-width:180px;}
+  .search-wrap input{
+    width:100%; background:var(--bp-mid); border:1px solid var(--grid-line-strong);
+    border-radius:var(--radius); padding:11px 14px 11px 36px; color:var(--ink);
+    font-family:'Inter',sans-serif; font-size:14px; outline:none;
+  }
+  .search-wrap input::placeholder{color:var(--ink-dimmer);}
+  .search-wrap input:focus{border-color:var(--amber);}
+  .search-wrap svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:0.5;}
+
+  select.filter-select{
+    background:var(--bp-mid); border:1px solid var(--grid-line-strong); border-radius:var(--radius);
+    padding:10px 12px; color:var(--ink); font-family:'JetBrains Mono',monospace; font-size:12.5px;
+    outline:none; cursor:pointer;
+  }
+  select.filter-select:focus{border-color:var(--amber);}
+
+  .filter-row{display:flex; flex-wrap:wrap; gap:12px; align-items:center; width:100%;}
+  .pill-group{display:flex; gap:6px; flex-wrap:wrap;}
+  .pill{
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:0.03em;
+    padding:8px 13px; border-radius:999px; border:1px solid var(--grid-line-strong);
+    background:transparent; color:var(--ink-dim); cursor:pointer; transition:all .15s ease;
+    user-select:none; white-space:nowrap;
+  }
+  .pill:hover{border-color:var(--ink-dimmer); color:var(--ink);}
+  .pill.active{background:var(--amber); border-color:var(--amber); color:#0B2340; font-weight:600;}
+  .pill.active[data-tier="reach"]{background:var(--copper); border-color:var(--copper);}
+  .pill.active[data-tier="target"]{background:var(--teal); border-color:var(--teal);}
+  .pill.active[data-tier="likely"]{background:var(--likely); border-color:var(--likely);}
+
+  .count-note{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-dimmer); margin-left:auto;}
+
+  .table-wrap{padding:0 5vw 60px; overflow-x:auto;}
+  table{width:100%; border-collapse:collapse; min-width:1020px; margin-top:18px;}
+  thead th{
+    text-align:left; font-family:'JetBrains Mono',monospace; font-size:11px;
+    text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-dimmer);
+    padding:10px 12px; border-bottom:1px solid var(--grid-line-strong);
+    cursor:pointer; user-select:none; white-space:nowrap;
+  }
+  thead th:hover{color:var(--amber);}
+  tbody tr.row{border-bottom:1px solid var(--grid-line); cursor:pointer; transition:background .12s ease;}
+  tbody tr.row:hover{background:var(--bp-mid);}
+  tbody tr.row td{padding:14px 12px; font-size:13.5px; vertical-align:middle;}
+  .uni-name{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; color:var(--ink); display:flex; align-items:center; gap:7px;}
+  .flag{font-size:14px;}
+  .uni-loc{font-size:11.5px; color:var(--ink-dimmer); margin-top:2px;}
+  .badge{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10.5px;
+    text-transform:uppercase; letter-spacing:0.05em; padding:4px 9px; border-radius:5px; font-weight:600;
+  }
+  .badge.reach{background:var(--copper-dim); color:var(--copper);}
+  .badge.target{background:var(--teal-dim); color:var(--teal);}
+  .badge.likely{background:var(--likely-dim); color:var(--likely);}
+  .badge.strong{background:var(--teal-dim); color:var(--teal);}
+  .badge.competitive{background:var(--amber-dim); color:var(--amber);}
+  .badge.reachforyou{background:var(--copper-dim); color:var(--copper);}
+  .badge.below{background:var(--red-dim); color:var(--red);}
+  .badge.neutral{background:rgba(143,171,201,0.1); color:var(--ink-dimmer);}
+  .prog-tag{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px;
+    padding:2px 6px; border:1px solid var(--grid-line-strong); border-radius:4px; margin-right:4px; color:var(--ink-dim);
+  }
+  .rank-cell{font-family:'JetBrains Mono',monospace; color:var(--ink-dim); font-size:13px;}
+  .rank-cell .dash{color:var(--ink-dimmer);}
+  .accept-cell{font-family:'JetBrains Mono',monospace; font-size:12.5px;}
+  .tuition-cell{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-dim);}
+  .chevron{color:var(--ink-dimmer); transition:transform .18s ease; display:inline-block;}
+  tr.row.expanded .chevron{transform:rotate(90deg); color:var(--amber);}
+
+  tr.detail-row td{padding:0; border-bottom:1px solid var(--grid-line-strong);}
+  .detail-inner{
+    display:none; padding:20px 12px 26px; background:var(--bp-panel);
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:20px;
+  }
+  tr.detail-row.open .detail-inner{display:grid;}
+  .detail-block .dt-label{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase;
+    letter-spacing:0.06em; color:var(--amber); margin-bottom:6px;
+  }
+  .detail-block .dt-val{font-size:13.5px; color:var(--ink-dim); line-height:1.5;}
+  .detail-block a{color:var(--likely); text-decoration:none; font-family:'JetBrains Mono',monospace; font-size:12.5px;}
+  .detail-block a:hover{text-decoration:underline;}
+
+  .empty-state{padding:60px 5vw; text-align:center; color:var(--ink-dimmer); font-family:'JetBrains Mono',monospace; font-size:13px;}
+
+  .disclaimer{
+    margin:20px 5vw 0; padding:14px 18px; background:var(--amber-dim); border:1px solid var(--amber);
+    border-radius:var(--radius); font-size:12.5px; color:var(--ink-dim); line-height:1.5;
+  }
+  .disclaimer b{color:var(--amber);}
+
+  footer{
+    padding:26px 5vw 40px; border-top:1px solid var(--grid-line-strong);
+    display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px;
+  }
+  .titleblock{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-dimmer);
+    border:1px solid var(--grid-line-strong); padding:10px 14px; border-radius:6px; line-height:1.7;
+  }
+  .titleblock b{color:var(--ink-dim);}
+  footer .note{font-size:12.5px; color:var(--ink-dimmer); max-width:540px; line-height:1.5;}
+
+  @media (max-width:640px){
+    .header-meta{gap:14px;}
+    thead{display:none;}
+    table, tbody, tr.row, tr.row td{display:block; width:100%;}
+    tr.row td{padding:4px 12px;}
+    tr.row{padding:12px 0;}
+    .detail-inner{grid-template-columns:1fr 1fr;}
+    .profile-grid{gap:14px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="eyebrow">Drawing No. UF‑2027‑CS/CE · Rev C · Global Edition</div>
+  <h1 class="display">University Finder — CS &amp; Computer Engineering</h1>
+  <p class="sub">A working shortlist of universities strong in Computer Science and/or Computer Engineering across the USA, UK, Canada, Pakistan, and the Gulf (Bahrain, Saudi Arabia, Qatar) — built for a UK A‑level student graduating June 2027. Enter your grades below for a live match rating, then filter, sort, and click any row for full detail.</p>
+  <div class="header-meta">
+    <span><b>Applicant profile:</b> A‑level, Class of 2027</span>
+    <span><b>Target intake:</b> 2027 entry</span>
+    <span><b>Programs:</b> CS · CE · SE · DS/AI · EE</span>
+  </div>
+</header>
+
+<div class="stats" id="statsStrip"></div>
+
+<div class="profile-panel">
+  <div class="corner tl"></div><div class="corner br"></div>
+  <div class="profile-title">Your profile</div>
+  <div class="profile-sub">Enter predicted or actual grades to see a live match rating for every university. Nothing here is saved or sent anywhere — it only lives in this browser tab.</div>
+  <div class="profile-grid">
+    <div class="profile-field">
+      <label>Subject 1 (e.g. Maths)</label>
+      <select id="grade1">
+        <option value="">–</option>
+        <option value="6">A*</option><option value="5">A</option><option value="4">B</option>
+        <option value="3">C</option><option value="2">D</option><option value="1">E</option>
+      </select>
+    </div>
+    <div class="profile-field">
+      <label>Subject 2 (e.g. Further Maths)</label>
+      <select id="grade2">
+        <option value="">–</option>
+        <option value="6">A*</option><option value="5">A</option><option value="4">B</option>
+        <option value="3">C</option><option value="2">D</option><option value="1">E</option>
+      </select>
+    </div>
+    <div class="profile-field">
+      <label>Subject 3 (e.g. Physics/CS)</label>
+      <select id="grade3">
+        <option value="">–</option>
+        <option value="6">A*</option><option value="5">A</option><option value="4">B</option>
+        <option value="3">C</option><option value="2">D</option><option value="1">E</option>
+      </select>
+    </div>
+    <div class="profile-field">
+      <label>SAT score (US only)</label>
+      <input type="number" id="satInput" placeholder="400–1600" min="400" max="1600" step="10">
+    </div>
+    <button class="profile-reset" id="resetProfile">Clear</button>
+  </div>
+  <div class="profile-status" id="profileStatus"></div>
+</div>
+
+<div class="controls">
+  <div class="filter-row">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#93AAC5" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search by university or location…">
+    </div>
+    <select class="filter-select" id="sortSelect">
+      <option value="csrank">Sort: Nat'l/World rank</option>
+      <option value="accept">Sort: Acceptance rate</option>
+      <option value="tuition">Sort: Tuition (USD equiv., low→high)</option>
+      <option value="name">Sort: Name (A→Z)</option>
+      <option value="match">Sort: Best match for you</option>
+    </select>
+    <span class="count-note" id="countNote"></span>
+  </div>
+  <div class="pill-group" id="countryPills">
+    <button class="pill active" data-country="all">All countries</button>
+    <button class="pill" data-country="US">🇺🇸 USA</button>
+    <button class="pill" data-country="UK">🇬🇧 UK</button>
+    <button class="pill" data-country="CA">🇨🇦 Canada</button>
+    <button class="pill" data-country="PK">🇵🇰 Pakistan</button>
+    <button class="pill" data-country="BH">🇧🇭 Bahrain</button>
+    <button class="pill" data-country="SA">🇸🇦 Saudi Arabia</button>
+    <button class="pill" data-country="QA">🇶🇦 Qatar</button>
+  </div>
+  <div class="pill-group" id="tierPills">
+    <button class="pill active" data-tier="all">All tiers</button>
+    <button class="pill" data-tier="reach">Reach</button>
+    <button class="pill" data-tier="target">Target</button>
+    <button class="pill" data-tier="likely">Likely</button>
+  </div>
+  <div class="pill-group" id="progPills">
+    <button class="pill active" data-prog="all">All programs</button>
+    <button class="pill" data-prog="CS">CS</button>
+    <button class="pill" data-prog="CE">CE</button>
+    <button class="pill" data-prog="SE">Software Eng.</button>
+    <button class="pill" data-prog="DS">Data Sci/AI</button>
+    <button class="pill" data-prog="EE">Electrical Eng.</button>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <div class="disclaimer">
+    <b>Before you rely on any number here:</b> rankings, acceptance rates, tuition, and entry requirements change every admissions cycle, and figures below are informed estimates rather than live official data. US rankings use U.S. News; UK/Canada/Gulf/Pakistan use QS World Rankings by subject where available — these systems aren't directly comparable to each other. Tuition figures for Pakistan, Bahrain, Saudi Arabia, and Qatar are especially approximate (local sources vary widely), and some Gulf public universities primarily serve national students with limited or scholarship‑only international admission — always confirm directly with the university before applying.
+  </div>
+  <table id="uniTable">
+    <thead>
+      <tr>
+        <th data-sort="name">University</th>
+        <th data-sort="tier">Tier</th>
+        <th data-sort="csrank">Rank</th>
+        <th data-sort="accept">Accept. Rate</th>
+        <th data-sort="tuition">Est. Tuition/yr (Intl)</th>
+        <th>Requirement</th>
+        <th>Your match</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="empty-state" id="emptyState" style="display:none;">No universities match those filters — try widening your search.</div>
+</div>
+
+<footer>
+  <div class="titleblock">
+    <b>SHEET</b> 1/1 &nbsp; <b>SCALE</b> N/A &nbsp; <b>DATE</b> 2026‑08 &nbsp;<br>
+    <b>SUBJECT</b> Global CS/CE Shortlist &nbsp; <b>FOR</b> A‑Level → 2027 entry
+  </div>
+  <div class="note">"Rank" mixes U.S. News (US) and QS World Rankings by subject (everywhere else) — treat as within‑country signal only, not a cross‑country comparison. CS/CE‑specific acceptance is often lower than the campus‑wide rate shown, especially where the major is separately admitted.</div>
+</footer>
+
+<script>
+const US_DATA = [
+  {name:"Massachusetts Institute of Technology", loc:"Cambridge, MA", country:"US", tier:"reach", programs:["CS","CE"], csRank:1, rankSystem:"US News", accept:"~4%", acceptNum:4, tuition:62900, currency:"$", test:"Required", satRange:[1540,1580], ea:"Nov 1", rd:"Jan 1", alevel:"A*A*A* — exceptional STEM depth expected", alevelPoints:17, strengths:"World's top CS/EECS department; unmatched research access; combined 6‑3 (CS) and 6‑2 (EECS+CE) degree tracks.", aid:"Need‑blind and meets full demonstrated need for ALL applicants, including international students (a recent policy change — verify current status).", site:"https://mit.edu"},
+  {name:"Stanford University", loc:"Stanford, CA", country:"US", tier:"reach", programs:["CS","DS"], csRank:3, rankSystem:"US News", accept:"~3.6%", acceptNum:3.6, tuition:64000, currency:"$", test:"Optional", satRange:[1500,1570], ea:"Nov 1 (REA)", rd:"Jan 5", alevel:"A*A*A* — top academics plus a standout personal project or research angle", alevelPoints:17, strengths:"Elite CS program tightly linked to Silicon Valley; strengths in AI/ML, HCI, and systems.", aid:"Need‑aware for international applicants; aid can still be generous once admitted.", site:"https://stanford.edu"},
+  {name:"Carnegie Mellon University", loc:"Pittsburgh, PA", country:"US", tier:"reach", programs:["CS","CE","SE","DS"], csRank:1, rankSystem:"US News", accept:"~11%", acceptNum:11, tuition:64000, currency:"$", test:"Optional", satRange:[1500,1560], ea:"Nov 1", rd:"Jan 3", alevel:"A*A*A* — School of Computer Science is separately and very selectively admitted", alevelPoints:17, strengths:"Consistently ranked #1 in multiple CS specialties (AI, systems, PL); strong ECE for computer engineering; first dedicated undergraduate AI degree in the US.", aid:"Need‑aware for international students; limited aid pool.", site:"https://cmu.edu"},
+  {name:"UC Berkeley", loc:"Berkeley, CA", country:"US", tier:"reach", programs:["CS","CE","DS"], csRank:3, rankSystem:"US News", accept:"~11%", acceptNum:11, tuition:52600, currency:"$", test:"Not considered", satRange:[1440,1550], ea:"—", rd:"Nov 30", alevel:"A*AA — EECS admission is markedly more competitive than the campus rate", alevelPoints:16, strengths:"Top public university for CS/EECS; direct EECS major is extremely competitive to enter.", aid:"Very limited need‑based aid for international students — largely self‑funded.", site:"https://berkeley.edu"},
+  {name:"Princeton University", loc:"Princeton, NJ", country:"US", tier:"reach", programs:["CS"], csRank:5, rankSystem:"US News", accept:"~4%", acceptNum:4, tuition:62400, currency:"$", test:"Optional", satRange:[1500,1570], ea:"Nov 1 (SCEA)", rd:"Jan 1", alevel:"A*A*A* — small, research‑intensive CS cohort", alevelPoints:17, strengths:"Small class sizes, strong theory and systems research, flexible AB/BSE routes into CS.", aid:"Need‑blind and meets full need for all admits, including international students.", site:"https://princeton.edu"},
+  {name:"Georgia Institute of Technology", loc:"Atlanta, GA", country:"US", tier:"target", programs:["CS","CE"], csRank:5, rankSystem:"US News", accept:"~15%", acceptNum:15, tuition:33700, currency:"$", test:"Optional", satRange:[1400,1540], ea:"Oct 15 / Nov 1", rd:"Jan 4", alevel:"A*AA — competitive but more attainable than the private‑school reach tier", alevelPoints:16, strengths:"Elite CS and CE at a comparatively low sticker price; heavy recruiting from big tech.", aid:"Little need‑based aid for international students; mostly merit‑light.", site:"https://gatech.edu"},
+  {name:"University of Illinois Urbana‑Champaign", loc:"Urbana‑Champaign, IL", country:"US", tier:"target", programs:["CS","CE"], csRank:5, rankSystem:"US News", accept:"~44%", acceptNum:44, tuition:61000, currency:"$", test:"Optional", satRange:[1350,1520], ea:"Nov 1", rd:"Jan 5", alevel:"A*AA — direct admission to the CS major is far more selective than overall campus rate", alevelPoints:16, strengths:"One of the strongest CS departments in the world; excellent ECE for computer engineering.", aid:"Minimal need‑based aid for international students.", site:"https://illinois.edu"},
+  {name:"Cornell University", loc:"Ithaca, NY", country:"US", tier:"reach", programs:["CS"], csRank:9, rankSystem:"US News", accept:"~7%", acceptNum:7, tuition:68000, currency:"$", test:"Optional", satRange:[1470,1550], ea:"Nov 1 (ED)", rd:"Jan 2", alevel:"A*AA — CS admission via Engineering or Arts & Sciences, both competitive", alevelPoints:16, strengths:"Strong industry pipelines (NYC Tech campus), broad CS specialties.", aid:"Need‑aware for international applicants.", site:"https://cornell.edu"},
+  {name:"University of Pennsylvania", loc:"Philadelphia, PA", country:"US", tier:"reach", programs:["CS"], csRank:6, rankSystem:"US News", accept:"~6%", acceptNum:6, tuition:68000, currency:"$", test:"Optional", satRange:[1500,1560], ea:"Nov 1 (ED)", rd:"Jan 5", alevel:"A*A*A* — the Jerome Fisher M&T dual‑degree (engineering + business) is separately and extremely selective", alevelPoints:17, strengths:"Rigorous CS with direct access to Wharton; unique M&T dual‑degree program blending engineering and business.", aid:"Need‑blind and meets full need for all admits, including international students.", site:"https://upenn.edu"},
+  {name:"Duke University", loc:"Durham, NC", country:"US", tier:"reach", programs:["CS"], csRank:20, rankSystem:"US News", accept:"~6%", acceptNum:6, tuition:68000, currency:"$", test:"Optional", satRange:[1500,1560], ea:"Nov 1 (ED)", rd:"Jan 3", alevel:"A*AA — CS has grown rapidly into one of Duke's most popular majors", alevelPoints:16, strengths:"Fast‑rising CS department with strong interdisciplinary ties to the Pratt School of Engineering.", aid:"Need‑blind and meets full need for all admits, including international students.", site:"https://duke.edu"},
+  {name:"Rice University", loc:"Houston, TX", country:"US", tier:"target", programs:["CS","CE"], csRank:20, rankSystem:"US News", accept:"~9%", acceptNum:9, tuition:58000, currency:"$", test:"Optional", satRange:[1500,1570], ea:"Nov 1", rd:"Jan 4", alevel:"AAA — small cohort, holistic review", alevelPoints:15, strengths:"Small classes, strong CS and Electrical & Computer Engineering, close to Houston's energy/tech corridor.", aid:"Need‑blind and meets full need for all admits, including international students.", site:"https://rice.edu"},
+  {name:"New York University", loc:"New York, NY", country:"US", tier:"target", programs:["CS"], csRank:20, rankSystem:"US News", accept:"~8%", acceptNum:8, tuition:63000, currency:"$", test:"Optional", satRange:[1470,1560], ea:"Nov 1 (ED)", rd:"Jan 5", alevel:"AAA — Courant (Arts & Science) or Tandon (Engineering) routes into CS", alevelPoints:15, strengths:"Strong theoretical CS at Courant, applied/engineering CS at Tandon, unmatched NYC internship access.", aid:"Need‑aware for international applicants; aid is limited relative to need.", site:"https://nyu.edu"},
+  {name:"University of Michigan", loc:"Ann Arbor, MI", country:"US", tier:"target", programs:["CS","CE"], csRank:10, rankSystem:"US News", accept:"~10%", acceptNum:10, tuition:59000, currency:"$", test:"Optional", satRange:[1350,1530], ea:"Nov 1", rd:"Feb 1", alevel:"A*AA — direct CS admit is competitive; CE via College of Engineering", alevelPoints:16, strengths:"Strong College of Engineering, healthy CE/EECS pipeline, active co‑op/internship culture.", aid:"Limited aid for international students.", site:"https://umich.edu"},
+  {name:"University of Texas at Austin", loc:"Austin, TX", country:"US", tier:"target", programs:["CS","CE"], csRank:8, rankSystem:"US News", accept:"~29%", acceptNum:29, tuition:40000, currency:"$", test:"Required (recommended if not auto‑admit)", satRange:[1300,1480], ea:"—", rd:"Dec 1 (priority)", alevel:"AAA — direct CS admission is notably more selective than campus‑wide rate", alevelPoints:15, strengths:"Nationally strong CS and ECE, plus deep ties to Austin's booming tech sector.", aid:"Minimal need‑based aid for international students.", site:"https://utexas.edu"},
+  {name:"Purdue University", loc:"West Lafayette, IN", country:"US", tier:"target", programs:["CS","CE"], csRank:14, rankSystem:"US News", accept:"~53%", acceptNum:53, tuition:38600, currency:"$", test:"Optional", satRange:[1300,1500], ea:"Nov 1", rd:"Jan 15", alevel:"AAB — CS/CE majors more selective than the general admit rate", alevelPoints:14, strengths:"One of the best‑known Computer Engineering programs in the US; large, well‑resourced CS dept.", aid:"Minimal need‑based aid; some merit scholarships available.", site:"https://purdue.edu"},
+  {name:"UC San Diego", loc:"La Jolla, CA", country:"US", tier:"target", programs:["CS"], csRank:15, rankSystem:"US News", accept:"~24%", acceptNum:24, tuition:47000, currency:"$", test:"Not considered", satRange:[1310,1500], ea:"—", rd:"Nov 30", alevel:"AAA — CS impaction makes the major noticeably harder than campus average", alevelPoints:15, strengths:"Jacobs School of Engineering; strong systems and bioinformatics‑adjacent CS.", aid:"Minimal need‑based aid for international students.", site:"https://ucsd.edu"},
+  {name:"UCLA", loc:"Los Angeles, CA", country:"US", tier:"reach", programs:["CS"], csRank:10, rankSystem:"US News", accept:"~9%", acceptNum:9, tuition:47800, currency:"$", test:"Not considered", satRange:[1310,1530], ea:"—", rd:"Nov 30", alevel:"A*AA — CS is one of the most oversubscribed majors on campus", alevelPoints:16, strengths:"Strong CS theory and AI groups; competitive direct‑admit major.", aid:"Minimal need‑based aid for international students.", site:"https://ucla.edu"},
+  {name:"University of Washington", loc:"Seattle, WA", country:"US", tier:"reach", programs:["CS"], csRank:6, rankSystem:"US News", accept:"~43%", acceptNum:43, tuition:42000, currency:"$", test:"Optional", satRange:[1330,1520], ea:"—", rd:"Nov 15", alevel:"A*AA — Allen School CS admission is highly selective on top of general admission", alevelPoints:16, strengths:"Allen School is one of the top CS programs nationally; deep ties to Seattle tech employers.", aid:"Minimal need‑based aid for international students.", site:"https://washington.edu"},
+  {name:"University of Southern California", loc:"Los Angeles, CA", country:"US", tier:"reach", programs:["CS"], csRank:19, rankSystem:"US News", accept:"~9%", acceptNum:9, tuition:68000, currency:"$", test:"Optional", satRange:[1400,1530], ea:"Nov 1", rd:"Jan 15", alevel:"AAA — strong all‑round profile expected, holistic review", alevelPoints:15, strengths:"Viterbi School of Engineering; strengths in AI, games, and computer graphics.", aid:"Merit scholarships available; limited need‑based aid.", site:"https://usc.edu"},
+  {name:"Virginia Tech", loc:"Blacksburg, VA", country:"US", tier:"likely", programs:["CE"], csRank:28, rankSystem:"US News", accept:"~54%", acceptNum:54, tuition:34300, currency:"$", test:"Optional", satRange:[1240,1420], ea:"Nov 1 (ED)", rd:"Jan 15", alevel:"AAB — solid, achievable profile for a strong CE applicant", alevelPoints:14, strengths:"One of the best‑regarded Computer Engineering programs; strong co‑op culture.", aid:"Minimal need‑based aid for international students.", site:"https://vt.edu"},
+  {name:"University of Wisconsin–Madison", loc:"Madison, WI", country:"US", tier:"target", programs:["CS"], csRank:16, rankSystem:"US News", accept:"~38%", acceptNum:38, tuition:40000, currency:"$", test:"Optional", satRange:[1300,1450], ea:"Nov 1 (REA)", rd:"Feb 1", alevel:"AAB — CS capacity constraints make the major more selective than admission overall", alevelPoints:14, strengths:"Strong systems and computer‑architecture research groups.", aid:"Minimal need‑based aid for international students.", site:"https://wisc.edu"},
+  {name:"Northeastern University", loc:"Boston, MA", country:"US", tier:"reach", programs:["CS"], csRank:33, rankSystem:"US News", accept:"~4%", acceptNum:4, tuition:65000, currency:"$", test:"Optional", satRange:[1460,1540], ea:"Nov 1 (ED1)", rd:"Jan 1", alevel:"AAA — selectivity has risen sharply in recent cycles", alevelPoints:15, strengths:"Signature co‑op program gives multiple paid industry placements before graduation.", aid:"Limited need‑based aid for international students.", site:"https://northeastern.edu"},
+  {name:"University of Massachusetts Amherst", loc:"Amherst, MA", country:"US", tier:"target", programs:["CS"], csRank:20, rankSystem:"US News", accept:"~57%", acceptNum:57, tuition:40000, currency:"$", test:"Optional", satRange:[1330,1500], ea:"—", rd:"Jan 15", alevel:"AAB — direct CS admission is considerably more selective than the campus‑wide rate", alevelPoints:14, strengths:"One of the strongest public CS departments in the US, especially in AI research.", aid:"Minimal need‑based aid for international students.", site:"https://umass.edu"},
+  {name:"University of Maryland", loc:"College Park, MD", country:"US", tier:"target", programs:["CS","CE"], csRank:15, rankSystem:"US News", accept:"~44%", acceptNum:44, tuition:40000, currency:"$", test:"Optional", satRange:[1350,1520], ea:"—", rd:"Jan 20", alevel:"A*AA — the limited‑enrollment CS program is highly competitive", alevelPoints:16, strengths:"Strong CS and ECE close to Washington DC's tech and government corridor.", aid:"Minimal need‑based aid for international students.", site:"https://umd.edu"},
+  {name:"Rensselaer Polytechnic Institute", loc:"Troy, NY", country:"US", tier:"target", programs:["CS","CE"], csRank:35, rankSystem:"US News", accept:"~44%", acceptNum:44, tuition:61000, currency:"$", test:"Optional", satRange:[1350,1510], ea:"Nov 1 (ED)", rd:"Feb 1", alevel:"AAB — the oldest technological university in the US", alevelPoints:14, strengths:"Deep, historic strength in CS and Electrical/Computer Engineering; strong co‑op culture.", aid:"Merit scholarships common; limited need‑based aid for international students.", site:"https://rpi.edu"},
+  {name:"Ohio State University", loc:"Columbus, OH", country:"US", tier:"likely", programs:["CS","CE"], csRank:40, rankSystem:"US News", accept:"~53%", acceptNum:53, tuition:37000, currency:"$", test:"Optional", satRange:[1230,1430], ea:"—", rd:"Feb 1 (priority)", alevel:"BBB — large, accessible CS/CE programs", alevelPoints:12, strengths:"Large flagship with strong CS/CE and growing AI research.", aid:"Minimal need‑based aid for international students.", site:"https://osu.edu"},
+  {name:"North Carolina State University", loc:"Raleigh, NC", country:"US", tier:"target", programs:["CS","CE"], csRank:30, rankSystem:"US News", accept:"~44%", acceptNum:44, tuition:33000, currency:"$", test:"Optional", satRange:[1280,1440], ea:"—", rd:"Jan 15", alevel:"AAB — strong, comparatively affordable CS/CE options", alevelPoints:14, strengths:"Well‑regarded CS and Computer Engineering in North Carolina's Research Triangle tech corridor.", aid:"Minimal need‑based aid for international students.", site:"https://ncsu.edu"},
+  {name:"University of Colorado Boulder", loc:"Boulder, CO", country:"US", tier:"likely", programs:["CS"], csRank:40, rankSystem:"US News", accept:"~78%", acceptNum:78, tuition:42000, currency:"$", test:"Optional", satRange:[1170,1400], ea:"—", rd:"Jan 15 (priority)", alevel:"BBB — accessible overall admission; the CS major itself is more selective", alevelPoints:12, strengths:"Strong aerospace/tech ecosystem in Boulder; solid CS fundamentals.", aid:"Minimal need‑based aid for international students.", site:"https://colorado.edu"},
+  {name:"Arizona State University", loc:"Tempe, AZ", country:"US", tier:"likely", programs:["CS","CE"], csRank:40, rankSystem:"US News", accept:"~88%", acceptNum:88, tuition:32900, currency:"$", test:"Optional", satRange:[1140,1350], ea:"—", rd:"Feb 1 (priority)", alevel:"BBB — high admit rate, direct entry into CS/CE for qualified applicants", alevelPoints:12, strengths:"Large, accessible CS/CE programs with flexible pathways and strong online/hybrid resources.", aid:"Merit scholarships available for strong international applicants.", site:"https://asu.edu"},
+  {name:"Penn State University", loc:"University Park, PA", country:"US", tier:"likely", programs:["CS","CE"], csRank:35, rankSystem:"US News", accept:"~49%", acceptNum:49, tuition:40000, currency:"$", test:"Optional", satRange:[1160,1390], ea:"—", rd:"Nov 30 (priority)", alevel:"BBB — comfortably achievable for a solid STEM profile", alevelPoints:12, strengths:"Large, well‑resourced CS and CE departments with strong industry recruiting.", aid:"Minimal need‑based aid for international students.", site:"https://psu.edu"}
+];
+
+const UK_DATA = [
+  {name:"University of Cambridge", loc:"Cambridge, England", country:"UK", tier:"reach", programs:["CS"], csRank:6, rankSystem:"QS World", accept:"~16%", acceptNum:16, tuition:37000, currency:"£", test:"Not applicable (A‑level + college interview)", satRange:null, ea:"—", rd:"15 Oct (UCAS)", alevel:"A*A*A — Maths essential, Further Maths very highly desirable", alevelPoints:17, strengths:"World‑leading theoretical CS via the Tripos system; unmatched depth in algorithms and formal methods.", aid:"Some need‑based bursaries exist but are limited for international students; college fees add on top of tuition.", site:"https://cam.ac.uk"},
+  {name:"University of Oxford", loc:"Oxford, England", country:"UK", tier:"reach", programs:["CS"], csRank:4, rankSystem:"QS World", accept:"~14%", acceptNum:14, tuition:40000, currency:"£", test:"Not applicable (Maths Admissions Test + interview)", satRange:null, ea:"—", rd:"15 Oct (UCAS)", alevel:"A*A*A — Maths required, MAT admissions test taken in‑cycle", alevelPoints:17, strengths:"Rigorous CS or joint Maths & CS degrees; small‑group tutorial teaching.", aid:"Limited need‑based aid for international students; college fees add on top of tuition.", site:"https://ox.ac.uk"},
+  {name:"Imperial College London", loc:"London, England", country:"UK", tier:"reach", programs:["CS","CE","EE"], csRank:2, rankSystem:"QS World", accept:"~12%", acceptNum:12, tuition:39000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"A*A*A — Maths required, Further Maths often required or highly desirable", alevelPoints:17, strengths:"STEM powerhouse with direct London tech/industry access; strong Computing and Electronic & Electrical Engineering (computer engineering equivalent).", aid:"Merit scholarships exist but need‑based aid for international students is limited.", site:"https://imperial.ac.uk"},
+  {name:"University College London (UCL)", loc:"London, England", country:"UK", tier:"target", programs:["CS","DS"], csRank:9, rankSystem:"QS World", accept:"~15%", acceptNum:15, tuition:34000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"A*AA — Maths required", alevelPoints:16, strengths:"Strong in AI/ML and interdisciplinary computing; large, research‑active department in central London.", aid:"Limited need‑based aid for international students.", site:"https://ucl.ac.uk"},
+  {name:"University of Edinburgh", loc:"Edinburgh, Scotland", country:"UK", tier:"target", programs:["CS","DS"], csRank:27, rankSystem:"QS World", accept:"~40%", acceptNum:40, tuition:32200, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"AAA — Maths required; Informatics‑specific admission is more selective than the headline rate", alevelPoints:15, strengths:"One of Europe's leading Informatics/AI research schools.", aid:"Some merit scholarships; limited need‑based aid for international students.", site:"https://ed.ac.uk"},
+  {name:"University of Manchester", loc:"Manchester, England", country:"UK", tier:"target", programs:["CS","CE"], csRank:34, rankSystem:"QS World", accept:"~35%", acceptNum:35, tuition:31200, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"A*AA–AAA — Maths required; Computer Systems Engineering route available", alevelPoints:15, strengths:"Strong CS department plus a distinct Computer Systems Engineering degree for hardware‑leaning applicants.", aid:"Limited need‑based aid for international students.", site:"https://manchester.ac.uk"},
+  {name:"University of Southampton", loc:"Southampton, England", country:"UK", tier:"likely", programs:["CS","CE","EE"], csRank:60, rankSystem:"QS World", accept:"~35%", acceptNum:35, tuition:28000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"AAA — Maths required; Physics recommended for Electronic Engineering route", alevelPoints:15, strengths:"Electronics & Computer Science (ECS) department is one of the UK's strongest for hardware‑adjacent computing.", aid:"Some merit scholarships for international students.", site:"https://southampton.ac.uk"},
+  {name:"University of Warwick", loc:"Coventry, England", country:"UK", tier:"target", programs:["CS"], csRank:69, rankSystem:"QS World", accept:"~25%", acceptNum:25, tuition:30000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"A*AA — Maths required, Further Maths desirable", alevelPoints:16, strengths:"Strong CS theory and discrete maths focus; close links to Warwick Manufacturing Group for engineering crossover.", aid:"Limited need‑based aid for international students.", site:"https://warwick.ac.uk"},
+  {name:"University of Bristol", loc:"Bristol, England", country:"UK", tier:"target", programs:["CS"], csRank:75, rankSystem:"QS World", accept:"~30%", acceptNum:30, tuition:30000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"AAA — Maths required", alevelPoints:15, strengths:"Strong systems and cyber‑security research; growing quantum computing links.", aid:"Limited need‑based aid for international students.", site:"https://bristol.ac.uk"},
+  {name:"Durham University", loc:"Durham, England", country:"UK", tier:"likely", programs:["CS"], csRank:100, rankSystem:"QS World", accept:"~30%", acceptNum:30, tuition:29000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"A*AA — Maths required", alevelPoints:16, strengths:"Small, collegiate CS department with a strong academic reputation and good staff‑student ratio.", aid:"Limited need‑based aid for international students.", site:"https://durham.ac.uk"},
+  {name:"King's College London", loc:"London, England", country:"UK", tier:"target", programs:["CS"], csRank:31, rankSystem:"QS World", accept:"~20%", acceptNum:20, tuition:32000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"AAA — Maths required", alevelPoints:15, strengths:"Rapidly growing CS reputation with a strong central London location.", aid:"Limited need‑based aid for international students.", site:"https://kcl.ac.uk"},
+  {name:"University of Birmingham", loc:"Birmingham, England", country:"UK", tier:"likely", programs:["CS"], csRank:120, rankSystem:"QS World", accept:"~35%", acceptNum:35, tuition:27000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"AAB — Maths usually required", alevelPoints:14, strengths:"Large, well‑resourced Russell Group CS department.", aid:"Limited need‑based aid for international students.", site:"https://birmingham.ac.uk"},
+  {name:"University of Glasgow", loc:"Glasgow, Scotland", country:"UK", tier:"target", programs:["CS"], csRank:110, rankSystem:"QS World", accept:"~30%", acceptNum:30, tuition:27000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"AAB — Maths required", alevelPoints:14, strengths:"Strong Scottish CS department with a growing software engineering focus.", aid:"Limited need‑based aid for international students.", site:"https://gla.ac.uk"},
+  {name:"University of Sheffield", loc:"Sheffield, England", country:"UK", tier:"likely", programs:["CS"], csRank:130, rankSystem:"QS World", accept:"~40%", acceptNum:40, tuition:26000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"ABB — Maths usually required", alevelPoints:13, strengths:"Solid, accessible CS with a strong AI research group.", aid:"Limited need‑based aid for international students.", site:"https://sheffield.ac.uk"},
+  {name:"University of Bath", loc:"Bath, England", country:"UK", tier:"target", programs:["CS","SE"], csRank:90, rankSystem:"QS World", accept:"~25%", acceptNum:25, tuition:28000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"AAA — Maths required", alevelPoints:15, strengths:"Renowned for graduate employability; strong industrial placement year culture.", aid:"Limited need‑based aid for international students.", site:"https://bath.ac.uk"},
+  {name:"University of Leeds", loc:"Leeds, England", country:"UK", tier:"likely", programs:["CS"], csRank:140, rankSystem:"QS World", accept:"~40%", acceptNum:40, tuition:27000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"ABB — Maths usually required", alevelPoints:13, strengths:"Large CS department with solid industry connections in the North of England.", aid:"Limited need‑based aid for international students.", site:"https://leeds.ac.uk"},
+  {name:"Loughborough University", loc:"Loughborough, England", country:"UK", tier:"likely", programs:["CS","SE"], csRank:160, rankSystem:"QS World", accept:"~40%", acceptNum:40, tuition:25000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"ABB — Maths usually required", alevelPoints:13, strengths:"Strong Computer Science and Software Systems Engineering with excellent placement rates.", aid:"Limited need‑based aid for international students.", site:"https://lboro.ac.uk"},
+  {name:"Queen Mary University of London", loc:"London, England", country:"UK", tier:"likely", programs:["CS"], csRank:150, rankSystem:"QS World", accept:"~35%", acceptNum:35, tuition:26000, currency:"£", test:"Not applicable (A‑level based)", satRange:null, ea:"—", rd:"29 Jan (UCAS)", alevel:"ABB — Maths usually required", alevelPoints:13, strengths:"Central London CS department with strong AI and networks research.", aid:"Limited need‑based aid for international students.", site:"https://qmul.ac.uk"}
+];
+
+const CA_DATA = [
+  {name:"University of Waterloo", loc:"Waterloo, ON", country:"CA", tier:"reach", programs:["CS","SE","CE"], csRank:41, rankSystem:"QS World", accept:"~53% overall (CS/SE effectively <10%)", acceptNum:10, tuition:70000, currency:"CAD", test:"Not required (Admission Information Form + academic average)", satRange:null, ea:"—", rd:"30 Jan (non‑Eng) / mid‑Dec (Engineering)", alevel:"A*A*A or higher — CS/SE admission averages are among the most competitive in Canada", alevelPoints:17, strengths:"World‑famous co‑op program (up to 6 paid work terms); widely considered Canada's top CS/Software Engineering school and a major Silicon Valley feeder.", aid:"Automatic CAD $10,000 entrance scholarship for eligible international first‑years; limited need‑based aid beyond that.", site:"https://uwaterloo.ca"},
+  {name:"University of Toronto", loc:"Toronto, ON", country:"CA", tier:"reach", programs:["CS","DS"], csRank:26, rankSystem:"QS World", accept:"~28% overall (CS Specialist stream more selective)", acceptNum:28, tuition:65000, currency:"CAD", test:"Not required", satRange:null, ea:"—", rd:"15 Jan", alevel:"A*AA — strong Grade‑12‑equivalent average expected, especially in Maths", alevelPoints:16, strengths:"Canada's top‑ranked CS program; deep AI research lineage via the Vector Institute.", aid:"Limited need‑based aid for international students; some merit entrance awards.", site:"https://utoronto.ca"},
+  {name:"University of British Columbia", loc:"Vancouver, BC", country:"CA", tier:"target", programs:["CS"], csRank:47, rankSystem:"QS World", accept:"~50% overall (CS more selective)", acceptNum:50, tuition:58000, currency:"CAD", test:"Not required", satRange:null, ea:"—", rd:"31 Jan", alevel:"AAA — competitive average required for direct CS entry", alevelPoints:15, strengths:"Strong CS program with close ties to Vancouver's tech sector; co‑op options available.", aid:"Limited need‑based aid for international students.", site:"https://ubc.ca"},
+  {name:"McGill University", loc:"Montreal, QC", country:"CA", tier:"target", programs:["CS","DS"], csRank:32, rankSystem:"QS World", accept:"~46% overall (CS more selective)", acceptNum:46, tuition:55000, currency:"CAD", test:"Not required", satRange:null, ea:"—", rd:"15 Jan", alevel:"AAA — strong Maths/Physics background expected", alevelPoints:15, strengths:"Strong theoretical CS; Montreal is a major global AI hub (Mila institute) with deep industry ties.", aid:"Limited need‑based aid for international students.", site:"https://mcgill.ca"},
+  {name:"University of Alberta", loc:"Edmonton, AB", country:"CA", tier:"likely", programs:["CS"], csRank:130, rankSystem:"QS World", accept:"~58%", acceptNum:58, tuition:40000, currency:"CAD", test:"Not required", satRange:null, ea:"—", rd:"1 Mar", alevel:"AAB — solid, achievable academic average", alevelPoints:14, strengths:"Internationally renowned for AI/reinforcement‑learning research; comparatively affordable.", aid:"Merit scholarships available for strong international applicants.", site:"https://ualberta.ca"}
+];
+
+const PK_DATA = [
+  {name:"National University of Sciences & Technology (NUST)", loc:"Islamabad", country:"PK", tier:"target", programs:["CS","CE","EE"], csRank:null, rankSystem:"QS Asia", accept:"Merit via NET (top ~15–20% of test‑takers admitted to CS/CE)", acceptNum:20, tuition:5400, currency:"$", test:"Required (NET entry test; SAT accepted for international applicants)", satRange:null, ea:"—", rd:"NET sessions run Dec–May (rolling; check current cycle)", alevel:"A*AA equivalent — minimum 60% aggregate required, but competitive CS/CE cutoffs run much higher", alevelPoints:15, strengths:"Pakistan's top defense‑affiliated public university for Engineering and Computing (SEECS); strong industry placement.", aid:"Need‑based and merit scholarships available; tuition is already low relative to Western options.", site:"https://nust.edu.pk"},
+  {name:"FAST — National University of Computer & Emerging Sciences", loc:"Karachi / Lahore / Islamabad", country:"PK", tier:"likely", programs:["CS","SE"], csRank:null, rankSystem:"QS Asia", accept:"Moderately selective via own admission test", acceptNum:35, tuition:450000, currency:"PKR", test:"Required (FAST admission test or SAT)", satRange:null, ea:"—", rd:"Rolling; main intake Aug, second intake Feb", alevel:"ABB equivalent — entrance test performance is weighted heavily", alevelPoints:13, strengths:"Pakistan's most dedicated CS‑focused university with a strong software‑industry pipeline and multiple city campuses.", aid:"Need‑based and merit scholarships/fee waivers available.", site:"https://nu.edu.pk"},
+  {name:"Lahore University of Management Sciences (LUMS)", loc:"Lahore", country:"PK", tier:"reach", programs:["CS"], csRank:null, rankSystem:"QS Asia", accept:"Highly selective — holistic review, among Pakistan's most competitive", acceptNum:10, tuition:1600000, currency:"PKR", test:"Required (LCAT or SAT) plus holistic application", satRange:null, ea:"—", rd:"Rolling; main deadline ~Mar for Aug intake", alevel:"A*AA equivalent — LUMS attracts Pakistan's top A‑level scorers", alevelPoints:16, strengths:"Pakistan's most prestigious all‑round university; small classes and a liberal‑arts‑style CS education via SBASSE.", aid:"Extensive need‑based financial aid — LUMS meets significant need for admitted students who apply for it.", site:"https://lums.edu.pk"},
+  {name:"Ghulam Ishaq Khan Institute (GIKI)", loc:"Topi, KPK", country:"PK", tier:"target", programs:["CE","EE"], csRank:null, rankSystem:"QS Asia", accept:"Merit via GIKI entry test, moderately selective", acceptNum:30, tuition:700000, currency:"PKR", test:"Required (GIKI entry test)", satRange:null, ea:"—", rd:"Rolling; main intake Aug", alevel:"AAB equivalent", alevelPoints:14, strengths:"Pakistan's premier engineering‑focused institute; particularly strong in Electrical and Computer Engineering.", aid:"Merit and need‑based scholarships available.", site:"https://giki.edu.pk"},
+  {name:"Habib University", loc:"Karachi", country:"PK", tier:"target", programs:["CS","CE"], csRank:null, rankSystem:"QS Asia", accept:"Selective, holistic review", acceptNum:25, tuition:1000000, currency:"PKR", test:"Required (own admission test/portfolio; SAT accepted)", satRange:null, ea:"—", rd:"Rolling; main deadline ~Apr for Aug intake", alevel:"AAB equivalent", alevelPoints:14, strengths:"Liberal‑arts‑integrated CS/Computer Engineering with small class sizes and a growing tech‑innovation reputation.", aid:"Strong need‑based financial aid relative to other Pakistani private universities.", site:"https://habib.edu.pk"},
+  {name:"COMSATS University Islamabad", loc:"Multiple campuses", country:"PK", tier:"likely", programs:["CS"], csRank:null, rankSystem:"QS Asia", accept:"Fairly accessible", acceptNum:55, tuition:280000, currency:"PKR", test:"Required (own admission test)", satRange:null, ea:"—", rd:"Rolling; main intake Aug", alevel:"BBB equivalent", alevelPoints:12, strengths:"Affordable, multi‑campus public‑sector university with a solid, accessible CS program.", aid:"Merit and need‑based scholarships available.", site:"https://comsats.edu.pk"}
+];
+
+const BH_DATA = [
+  {name:"University of Bahrain", loc:"Sakhir / Zallaq", country:"BH", tier:"likely", programs:["CS","CE"], csRank:null, rankSystem:"Regional", accept:"Accessible for qualified applicants", acceptNum:60, tuition:3000, currency:"BHD", test:"Not applicable (A‑level/high‑school based; English proficiency required)", satRange:null, ea:"—", rd:"Rolling; main intake Sep", alevel:"BBB equivalent", alevelPoints:12, strengths:"Bahrain's main national public university with English‑taught CS/IT programs at low cost.", aid:"Limited scholarships; heavily subsidized tuition for GCC residents.", site:"https://uob.edu.bh"},
+  {name:"Bahrain Polytechnic", loc:"Isa Town", country:"BH", tier:"likely", programs:["CS"], csRank:null, rankSystem:"Regional", accept:"Accessible", acceptNum:70, tuition:3200, currency:"BHD", test:"Not applicable", satRange:null, ea:"—", rd:"Rolling", alevel:"BBB equivalent", alevelPoints:12, strengths:"Applied, industry‑linked IT/CS programs with strong employer partnerships in Bahrain.", aid:"Limited scholarships available.", site:"https://polytechnic.bh"},
+  {name:"Ahlia University", loc:"Manama", country:"BH", tier:"likely", programs:["CS"], csRank:null, rankSystem:"Regional", accept:"Accessible", acceptNum:75, tuition:4000, currency:"BHD", test:"Not applicable", satRange:null, ea:"—", rd:"Rolling; main intake Sep", alevel:"BBB equivalent", alevelPoints:12, strengths:"Private university in Manama with flexible CS/IT programs, easy access for local/regional students.", aid:"Merit scholarships available.", site:"https://ahlia.edu.bh"}
+];
+
+const SA_DATA = [
+  {name:"King Fahd University of Petroleum & Minerals (KFUPM)", loc:"Dhahran", country:"SA", tier:"reach", programs:["CS","CE","EE"], csRank:67, rankSystem:"QS World", accept:"Highly selective for Saudi nationals; international undergraduate admission is limited", acceptNum:10, tuition:null, currency:"SAR", test:"Not applicable (Saudi curriculum/A‑level; international admission via credential evaluation)", satRange:null, ea:"—", rd:"Rolling; main intake Sep", alevel:"A*AA equivalent — the most academically selective university in Saudi Arabia", alevelPoints:16, strengths:"The Arab world's top‑ranked university for engineering and computing (QS World #67, 2026); strong industry ties to Aramco and the energy sector. Historically Saudi‑national‑focused and recently transitioning toward coeducation — confirm current international admission policy directly.", aid:"Full tuition, housing, and a stipend for admitted Saudi nationals; policy and cost for international undergraduates varies — verify directly with KFUPM.", site:"https://kfupm.edu.sa"},
+  {name:"Prince Sultan University", loc:"Riyadh", country:"SA", tier:"likely", programs:["CS","CE"], csRank:null, rankSystem:"Regional", accept:"Accessible for qualified applicants", acceptNum:55, tuition:50000, currency:"SAR", test:"Not applicable (A‑level/high‑school based; English proficiency required)", satRange:null, ea:"—", rd:"Rolling; main intake Sep", alevel:"BBB equivalent", alevelPoints:12, strengths:"ABET‑accredited Computer Science program; English‑taught and relatively accessible to international/expat applicants in Riyadh.", aid:"Merit scholarships available.", site:"https://psu.edu.sa"},
+  {name:"King Saud University", loc:"Riyadh", country:"SA", tier:"likely", programs:["CS"], csRank:null, rankSystem:"Regional", accept:"Primarily serves Saudi nationals; international admission is limited and often scholarship‑based", acceptNum:30, tuition:null, currency:"SAR", test:"Not applicable", satRange:null, ea:"—", rd:"Rolling", alevel:"AAB equivalent", alevelPoints:13, strengths:"Large flagship public university with a well‑established CS department and strong regional reputation.", aid:"Full scholarships available for select international students via Saudi government programs.", site:"https://ksu.edu.sa"}
+];
+
+const QA_DATA = [
+  {name:"Carnegie Mellon University in Qatar", loc:"Doha (Education City)", country:"QA", tier:"reach", programs:["CS","CE","DS"], csRank:null, rankSystem:"Carries CMU's global CS reputation", accept:"~12% (similar rigor to the Pittsburgh campus)", acceptNum:12, tuition:62900, currency:"$", test:"Optional", satRange:null, ea:"—", rd:"2 Jan (similar cycle to Pittsburgh)", alevel:"A*A*A* — same admissions bar as CMU Pittsburgh", alevelPoints:17, strengths:"Awards the exact same CMU diploma as Pittsburgh; small, highly selective cohort with generous Qatar Foundation funding.", aid:"Most admitted students receive substantial Qatar Foundation‑funded aid, often reducing real costs well below sticker tuition — confirm current packages.", site:"https://qatar.cmu.edu"},
+  {name:"Texas A&M University at Qatar", loc:"Doha (Education City)", country:"QA", tier:"target", programs:["CE","EE"], csRank:null, rankSystem:"Carries Texas A&M's ABET accreditation", accept:"~25% (similar rigor to a strong US state flagship)", acceptNum:25, tuition:45000, currency:"$", test:"Optional", satRange:null, ea:"—", rd:"Rolling; main deadline ~Feb", alevel:"AAA equivalent", alevelPoints:15, strengths:"ABET‑accredited Electrical & Computer Engineering degree identical to the College Station campus; Qatar Foundation support keeps real costs lower than sticker price for many students.", aid:"Qatar Foundation‑funded scholarships significantly reduce costs for many admitted students.", site:"https://qatar.tamu.edu"},
+  {name:"Qatar University", loc:"Doha", country:"QA", tier:"likely", programs:["CS","CE"], csRank:null, rankSystem:"Regional", accept:"Accessible, primarily serves Qatari/GCC students", acceptNum:50, tuition:12000, currency:"$", test:"Not applicable (high‑school/A‑level based)", satRange:null, ea:"—", rd:"Rolling; main intake Sep", alevel:"BBB equivalent", alevelPoints:12, strengths:"Qatar's national university, offering bilingual (Arabic/English) CS and Computer Engineering programs.", aid:"Limited scholarships for international students.", site:"https://qu.edu.qa"}
+];
+
+const DATA = [...US_DATA, ...UK_DATA, ...CA_DATA, ...PK_DATA, ...BH_DATA, ...SA_DATA, ...QA_DATA];
+
+const RATES = {"$":1, "£":1.27, "CAD":0.74, "PKR":1/280, "BHD":2.65, "SAR":0.267, "QAR":0.275};
+const FLAGS = {US:"🇺🇸", UK:"🇬🇧", CA:"🇨🇦", PK:"🇵🇰", BH:"🇧🇭", SA:"🇸🇦", QA:"🇶🇦"};
+
+const state = { search:"", tier:"all", prog:"all", country:"all", sort:"csrank", expanded:new Set() };
+const profile = { g1:null, g2:null, g3:null, sat:null };
+
+function fmtTuition(u){
+  if(u.tuition == null) return "See notes";
+  if(u.currency === "$" || u.currency === "£") return u.currency + u.tuition.toLocaleString("en-US");
+  return u.currency + " " + u.tuition.toLocaleString("en-US");
+}
+function usdValue(u){
+  if(u.tuition == null) return 0;
+  return u.tuition * (RATES[u.currency] || 1);
+}
+function rankCell(r){ return r == null ? '<span class="dash">—</span>' : "#" + r; }
+function flagFor(country){ return FLAGS[country] || ""; }
+
+function getAlevelTotal(){
+  const vals = [profile.g1, profile.g2, profile.g3].filter(v => v !== null && v !== "");
+  if(vals.length === 0) return null;
+  return vals.reduce((s,v) => s + Number(v), 0);
+}
+
+function matchFor(u){
+  const total = getAlevelTotal();
+  const sat = profile.sat;
+  if(total === null && (sat === null || u.satRange === null)) return null;
+
+  let alevelStatus = null;
+  if(total !== null){
+    const diff = total - u.alevelPoints;
+    if(diff >= 1) alevelStatus = "strong";
+    else if(diff === 0) alevelStatus = "competitive";
+    else if(diff >= -1) alevelStatus = "reachforyou";
+    else alevelStatus = "below";
+  }
+
+  let satStatus = null;
+  if(sat !== null && u.satRange){
+    if(sat >= u.satRange[1]) satStatus = "strong";
+    else if(sat >= u.satRange[0]) satStatus = "competitive";
+    else if(sat >= u.satRange[0] - 60) satStatus = "reachforyou";
+    else satStatus = "below";
+  }
+
+  const order = {strong:3, competitive:2, reachforyou:1, below:0};
+  const candidates = [alevelStatus, satStatus].filter(Boolean);
+  if(candidates.length === 0) return null;
+  candidates.sort((a,b) => order[a] - order[b]);
+  return candidates[0];
+}
+
+function matchLabel(status){
+  if(status === "strong") return "Strong match";
+  if(status === "competitive") return "Competitive";
+  if(status === "reachforyou") return "Reach for you";
+  if(status === "below") return "Below typical range";
+  return null;
+}
+
+function getFiltered(){
+  let rows = DATA.filter(u => {
+    const s = state.search.trim().toLowerCase();
+    const matchesSearch = !s || u.name.toLowerCase().includes(s) || u.loc.toLowerCase().includes(s);
+    const matchesTier = state.tier === "all" || u.tier === state.tier;
+    const matchesProg = state.prog === "all" || u.programs.includes(state.prog);
+    const matchesCountry = state.country === "all" || u.country === state.country;
+    return matchesSearch && matchesTier && matchesProg && matchesCountry;
+  });
+
+  rows.sort((a,b) => {
+    switch(state.sort){
+      case "csrank": return (a.csRank ?? 999) - (b.csRank ?? 999);
+      case "accept": return a.acceptNum - b.acceptNum;
+      case "tuition": return usdValue(a) - usdValue(b);
+      case "name": return a.name.localeCompare(b.name);
+      case "match": {
+        const order = {strong:3, competitive:2, reachforyou:1, below:0};
+        const am = matchFor(a), bm = matchFor(b);
+        return (order[bm] ?? -1) - (order[am] ?? -1);
+      }
+      default: return 0;
+    }
+  });
+  return rows;
+}
+
+function render(){
+  const rows = getFiltered();
+  const tbody = document.getElementById("tableBody");
+  const empty = document.getElementById("emptyState");
+  document.getElementById("countNote").textContent = rows.length + " of " + DATA.length + " universities";
+
+  if(rows.length === 0){
+    tbody.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  tbody.innerHTML = rows.map((u) => {
+    const isOpen = state.expanded.has(u.name);
+    const status = matchFor(u);
+    const matchHtml = status ? `<span class="badge ${status}">${matchLabel(status)}</span>` : `<span class="badge neutral">Add your grades ↑</span>`;
+    const requirementText = u.country === "US" ? u.test : u.alevel.split(" — ")[0];
+    return `
+      <tr class="row${isOpen ? ' expanded' : ''}" data-name="${u.name}">
+        <td>
+          <div class="uni-name"><span class="flag">${flagFor(u.country)}</span>${u.name}</div>
+          <div class="uni-loc">${u.loc} · ${u.programs.map(p=>`<span class="prog-tag">${p}</span>`).join('')}</div>
+        </td>
+        <td><span class="badge ${u.tier}">${u.tier}</span></td>
+        <td class="rank-cell">${rankCell(u.csRank)} <span style="color:var(--ink-dimmer);font-size:10px;">(${u.rankSystem})</span></td>
+        <td class="accept-cell">${u.accept}</td>
+        <td class="tuition-cell">${fmtTuition(u)}</td>
+        <td class="mono" style="font-size:12px;color:var(--ink-dim);">${requirementText}</td>
+        <td>${matchHtml}</td>
+        <td><span class="chevron">▸</span></td>
+      </tr>
+      <tr class="detail-row${isOpen ? ' open' : ''}" data-name="${u.name}">
+        <td colspan="8">
+          <div class="detail-inner">
+            <div class="detail-block">
+              <div class="dt-label">Application deadline${u.ea && u.ea !== "—" ? "s" : ""}</div>
+              <div class="dt-val">${u.ea && u.ea !== "—" ? `Early: ${u.ea}<br>Regular: ${u.rd}` : u.rd}</div>
+            </div>
+            <div class="detail-block">
+              <div class="dt-label">Competitive A‑level profile</div>
+              <div class="dt-val">${u.alevel}</div>
+            </div>
+            ${u.satRange ? `<div class="detail-block"><div class="dt-label">Typical SAT range (mid 50%)</div><div class="dt-val">${u.satRange[0]}–${u.satRange[1]}</div></div>` : ""}
+            <div class="detail-block">
+              <div class="dt-label">Program strengths</div>
+              <div class="dt-val">${u.strengths}</div>
+            </div>
+            <div class="detail-block">
+              <div class="dt-label">International financial aid</div>
+              <div class="dt-val">${u.aid}</div>
+            </div>
+            <div class="detail-block">
+              <div class="dt-label">Official site</div>
+              <div class="dt-val"><a href="${u.site}" target="_blank" rel="noopener">${u.site.replace('https://','')} ↗</a></div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  tbody.querySelectorAll("tr.row").forEach(tr => {
+    tr.addEventListener("click", () => {
+      const name = tr.dataset.name;
+      if(state.expanded.has(name)) state.expanded.delete(name);
+      else state.expanded.add(name);
+      render();
+    });
+  });
+}
+
+function renderStats(){
+  const total = DATA.length;
+  const byCountry = {};
+  DATA.forEach(u => { byCountry[u.country] = (byCountry[u.country]||0) + 1; });
+  const countrySummary = Object.keys(byCountry).map(c => byCountry[c] + " " + c).join(" / ");
+  const withTuition = DATA.filter(u => u.tuition != null);
+  const avgTuitionUsd = Math.round(withTuition.reduce((s,u)=>s+usdValue(u),0)/withTuition.length);
+  const reach = DATA.filter(u=>u.tier==="reach").length;
+  const target = DATA.filter(u=>u.tier==="target").length;
+  const likely = DATA.filter(u=>u.tier==="likely").length;
+
+  const stats = [
+    {num: total, label:"Universities tracked"},
+    {num: countrySummary, label:"By country"},
+    {num: "$" + avgTuitionUsd.toLocaleString("en-US"), label:"Avg. tuition (USD equiv.)"},
+    {num: reach, label:"Reach schools"},
+    {num: target, label:"Target schools"},
+    {num: likely, label:"Likely schools"},
+  ];
+  document.getElementById("statsStrip").innerHTML = stats.map(s=>`
+    <div class="stat"><div class="num display">${s.num}</div><div class="label">${s.label}</div></div>
+  `).join("");
+}
+
+function updateProfileStatus(){
+  const total = getAlevelTotal();
+  const el = document.getElementById("profileStatus");
+  const parts = [];
+  if(total !== null) parts.push(`A‑level points entered: <b>${total}</b> (of a possible 18)`);
+  if(profile.sat !== null) parts.push(`SAT: <b>${profile.sat}</b>`);
+  el.innerHTML = parts.length ? parts.join(" &nbsp;·&nbsp; ") + " — match ratings below are now live." : "Enter at least one grade or your SAT score to see match ratings appear in the table.";
+}
+
+document.getElementById("searchInput").addEventListener("input", e => { state.search = e.target.value; render(); });
+document.getElementById("sortSelect").addEventListener("change", e => { state.sort = e.target.value; render(); });
+
+document.getElementById("tierPills").querySelectorAll(".pill").forEach(btn=>{
+  btn.addEventListener("click", () => {
+    document.getElementById("tierPills").querySelectorAll(".pill").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    state.tier = btn.dataset.tier;
+    render();
+  });
+});
+document.getElementById("progPills").querySelectorAll(".pill").forEach(btn=>{
+  btn.addEventListener("click", () => {
+    document.getElementById("progPills").querySelectorAll(".pill").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    state.prog = btn.dataset.prog;
+    render();
+  });
+});
+document.getElementById("countryPills").querySelectorAll(".pill").forEach(btn=>{
+  btn.addEventListener("click", () => {
+    document.getElementById("countryPills").querySelectorAll(".pill").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    state.country = btn.dataset.country;
+    render();
+  });
+});
+
+["grade1","grade2","grade3"].forEach((id, idx) => {
+  document.getElementById(id).addEventListener("change", e => {
+    const key = "g" + (idx+1);
+    profile[key] = e.target.value === "" ? null : e.target.value;
+    updateProfileStatus();
+    render();
+  });
+});
+document.getElementById("satInput").addEventListener("input", e => {
+  profile.sat = e.target.value === "" ? null : Number(e.target.value);
+  updateProfileStatus();
+  render();
+});
+document.getElementById("resetProfile").addEventListener("click", () => {
+  profile.g1 = profile.g2 = profile.g3 = profile.sat = null;
+  document.getElementById("grade1").value = "";
+  document.getElementById("grade2").value = "";
+  document.getElementById("grade3").value = "";
+  document.getElementById("satInput").value = "";
+  updateProfileStatus();
+  render();
+});
+
+renderStats();
+updateProfileStatus();
+render();
+</script>
+</body>
+</html>
